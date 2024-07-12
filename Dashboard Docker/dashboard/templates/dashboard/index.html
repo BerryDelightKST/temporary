@@ -1,0 +1,86 @@
+
+{% extends 'base.html' %}
+
+{% block header %}
+    <div class="section-title">
+        <div>{% block title %}Dashboard{% endblock %}</div>
+        {% if g.user %}
+            <span id="username">{{ g.user["username"] }}</span>
+            <a href="{{ url_for('auth.logout') }}"><button>Log out</button></a>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block content %}
+{% if g.user %}
+    <div id="dashboard">
+        <div class="sub-section">
+            <div class="sub-section-title">SENSOR DATA</div>
+            <div id="data"></div>
+        </div>
+        <div class="sub-section">
+            <div class="sub-section-title">STATUS</div>
+            <div id="status">
+                <div id="uv-light-source"></div>
+                <div id="fan"></div>
+                <div id="pump"></div>
+            </div>
+        </div>
+        <div class="sub-section">
+            <div class="sub-section-title">CONFIGURATIONS</div>
+            <div>
+            <form action="/update">
+                <label for="config-profile">Select profile:</label>
+                <select id="select-config" name="name">
+                    {% for profile in config_profiles  %}
+                    <option value="{{ profile.config_name }}" {% if selected_config == profile.config_name %}selected{% endif %}>{{ profile.config_name }}</option>
+                    {% endfor %}
+
+
+                </select>
+                <input type="submit" value="Update">
+
+            </div>
+            <div id="config-profiles">
+                {% for profile in config_profiles %}
+                <div class="config-profile">
+                    <span class="config-name">{{ profile.config_name }}</span>
+                    <span class="config-param" name="on_ec_level" >
+                        <span class="config-value-name">Pump ON</span>
+                        <span><span class="config-value">{{ profile.on_ec_level }}</span><span class="config-value-unit">mS/cm</span></span>
+                    </span>
+                    <span class="config-param" name="on_light_level">
+                        <span class="config-value-name">UV light ON</span>
+                        <span><span class="config-value">{{ profile.on_light_level }}</span><span class="config-value-unit">lux</span></span>
+                    </span>
+                    <span class="config-param" name="off_light_level">
+                        <span class="config-value-name">UV light OFF</span>
+                        <span><span class="config-value">{{ profile.off_light_level }}</span><span class="config-value-unit">lux</span></span>
+                    </span>
+                    <span class="config-param" name="temp_setpoint">
+                        <span class="config-value-name">Temp. setpoint</span>
+                        <span><span class="config-value">{{ profile.temp_setpoint }}</span><span class="config-value-unit">°C</span></span>
+                    </span>
+                    <span class="config-param" name="temp_max">
+                        <span class="config-value-name">Temp. warning</span>
+                        <span><span class="config-value">{{ profile.temp_max }}</span><span class="config-value-unit">°C</span></span>
+                    </span>
+                    <span class="config-buttons">
+                        <button type="button" onclick="editConfig(this)">Edit</button>
+                        <button style="display: none;" type="button" onclick="submitEditConfig(this)">Submit</button>
+                        <button type="button" onclick="deleteConfig(this)">Delete</button>
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+            <button type="button" onclick="createConfig()">Create New</button>
+        </div>
+    </div>
+{% else %}
+    <a href="{{ url_for('auth.login') }}"/><button>Login</button></a>
+    <a href="{{ url_for('auth.register') }}"/><button>Register</button></a>
+{% endif %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='data.js') }}"></script>
+<script src="{{ url_for('static', filename='config_profiles.js') }}"></script>
+{% endblock %}

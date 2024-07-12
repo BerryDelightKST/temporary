@@ -1,0 +1,9 @@
+<title>{% block title %}{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<h1 id="title">Automatic Gardening System (WIP)</h1>
+<section class="content">
+  <header>
+    {% block header %}{% endblock %}
+  </header>
+    {% block content %}{% endblock %}
+</section>
